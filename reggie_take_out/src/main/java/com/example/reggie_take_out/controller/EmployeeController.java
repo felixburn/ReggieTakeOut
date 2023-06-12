@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
 @RequestMapping("/employee")
-// http://localhost:8080/employee/login
 public class EmployeeController {
 
     @Autowired
@@ -29,6 +29,7 @@ public class EmployeeController {
      * @param employee
      * @return
      */
+    // http://localhost:8080/employee/login
     @PostMapping("/login")
     public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
 
@@ -74,5 +75,35 @@ public class EmployeeController {
         request.getSession().removeAttribute("employee");
         // 2.返回结果（前端页面会进行跳转到登录页面）
         return R.success("退出成功");
+    }
+
+    /**
+     * 新增员工employee
+     * @param request
+     * @param employee
+     * @return
+     */
+    // http://localhost:8080/employee/login 在类上已经写了,这里不用写
+    @PostMapping()
+    // @RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的);
+    public R<String> save(HttpServletRequest request,@RequestBody Employee employee){
+
+        log.info("新增员工，员工信息：{}", employee.toString());
+        //目前employee中还没有数据的有password/create_time/update_time/create_user/update_user
+        //设置默认初始password:123456,需要进行md5加密处理
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+        //获取当前日期，设置到create_time/update_time中
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+        //获得当前登录用户的id
+        //getAttribute()统一返回的是Object类型，注意类型转换
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        //创建人的id,就是当前用户的id（在进行添加操作的id）
+        employee.setCreateUser(empId);
+        //更新人的id,此时为当前用户的id
+        employee.setUpdateUser(empId);
+        //mybatis提供的新增方法
+        employeeService.save(employee);
+        return R.success("新增员工成功");
     }
 }
