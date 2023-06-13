@@ -67,6 +67,7 @@ public class EmployeeController {
      * 退出功能
      * @return
      */
+    // http://localhost:8080/employee/logout
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request){
         // 1.清理session中的用户id
@@ -82,7 +83,7 @@ public class EmployeeController {
      * @param employee
      * @return
      */
-    // http://localhost:8080/employee/login 在类上已经写了,这里不用写
+    // http://localhost:8080/employee 在类上已经写了,这里不用写
     @PostMapping()
     // @RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的);
     public R<String> save(HttpServletRequest request,@RequestBody Employee employee) {
@@ -113,7 +114,7 @@ public class EmployeeController {
      * @param name
      * @return
      */
-    // http://localhost:8080/employee/login/page?page=1&pageSize=10
+    // http://localhost:8080/employee/page?page=1&pageSize=10
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize, String name){
         // page=1, pageSize=10, name=null 前端设置的默认值
@@ -131,5 +132,27 @@ public class EmployeeController {
         // 5.执行查询
         employeeService.page(pageInfo, queryWrapper);
         return R.success(pageInfo);
+    }
+
+    /**
+     * 根据id来修改员工信息
+     * @param request
+     * @param employee
+     * @return
+     */
+    // http://localhost:8080/employee
+    @PutMapping
+    public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
+        log.info(employee.toString());
+        // 拿到操作者的id，以便于下面setUpdateUser()
+        Long empId = (Long)request.getSession().getAttribute("employee");
+        // 设置本次update的更新时间和更新操作者
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+        // 我们的status不需要修改，因为前端传入的时候已经做了判断进行取反处理
+        // eg:状态正常(status=1)的只能修改为已禁用(status=0),因此取反传入的为0,显示禁用按钮
+        employeeService.updateById(employee);
+
+        return R.success("员工信息修改成功");
     }
 }
