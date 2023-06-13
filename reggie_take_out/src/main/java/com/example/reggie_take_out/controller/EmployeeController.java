@@ -1,16 +1,15 @@
 package com.example.reggie_take_out.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.reggie_take_out.common.R;
 import com.example.reggie_take_out.entity.Employee;
 import com.example.reggie_take_out.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -86,7 +85,7 @@ public class EmployeeController {
     // http://localhost:8080/employee/login 在类上已经写了,这里不用写
     @PostMapping()
     // @RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的);
-    public R<String> save(HttpServletRequest request,@RequestBody Employee employee){
+    public R<String> save(HttpServletRequest request,@RequestBody Employee employee) {
 
         log.info("新增员工，员工信息：{}", employee.toString());
         //目前employee中还没有数据的有password/create_time/update_time/create_user/update_user
@@ -105,5 +104,32 @@ public class EmployeeController {
         //mybatis提供的新增方法
         employeeService.save(employee);
         return R.success("新增员工成功");
+    }
+
+    /**
+     * 员工信息分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    // http://localhost:8080/employee/login/page?page=1&pageSize=10
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name){
+        // page=1, pageSize=10, name=null 前端设置的默认值
+        log.info("page={}, pageSize={}, name={}", page, pageSize, name);
+        // 1.执行分页构造器
+        Page pageInfo = new Page(page, pageSize);
+        // 2.构造条件构造器
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        // 3.添加过滤条件
+        //   public Children like(boolean condition, R column, java.lang.Object val);
+        queryWrapper.like(StringUtils.isNotEmpty(name), Employee::getName, name);
+        // 4.添加排序条件
+        //   按更新时间updateTime倒序排序desc
+        queryWrapper.orderByDesc(Employee::getUpdateTime);
+        // 5.执行查询
+        employeeService.page(pageInfo, queryWrapper);
+        return R.success(pageInfo);
     }
 }
