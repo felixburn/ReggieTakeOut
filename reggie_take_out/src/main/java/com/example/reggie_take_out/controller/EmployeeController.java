@@ -93,15 +93,15 @@ public class EmployeeController {
         //设置默认初始password:123456,需要进行md5加密处理
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
         //获取当前日期，设置到create_time/update_time中
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
         //获得当前登录用户的id
         //getAttribute()统一返回的是Object类型，注意类型转换
         Long empId = (Long) request.getSession().getAttribute("employee");
         //创建人的id,就是当前用户的id（在进行添加操作的id）
-        employee.setCreateUser(empId);
+        //employee.setCreateUser(empId);
         //更新人的id,此时为当前用户的id
-        employee.setUpdateUser(empId);
+        //employee.setUpdateUser(empId);
         //mybatis提供的新增方法
         employeeService.save(employee);
         return R.success("新增员工成功");
@@ -136,19 +136,18 @@ public class EmployeeController {
 
     /**
      * 根据id来修改员工信息
-     * @param request
      * @param employee
      * @return
      */
     // http://localhost:8080/employee
     @PutMapping
-    public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
+    public R<String> update(@RequestBody Employee employee){
         log.info(employee.toString());
         // 拿到操作者的id，以便于下面setUpdateUser()
-        Long empId = (Long)request.getSession().getAttribute("employee");
+        //Long empId = (Long)request.getSession().getAttribute("employee");
         // 设置本次update的更新时间和更新操作者
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(empId);
+        //employee.setUpdateTime(LocalDateTime.now());
+        //employee.setUpdateUser(empId);
         // 我们的status不需要修改，因为前端传入的时候已经做了判断进行取反处理
         // eg:状态正常(status=1)的只能修改为已禁用(status=0),因此取反传入的为0,显示禁用按钮
         employeeService.updateById(employee);
