@@ -17,3 +17,5 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: ASSIGN_ID # 默认使用雪花算法生成ID
+reggie:
+  path: E:\瑞吉外卖\images\
