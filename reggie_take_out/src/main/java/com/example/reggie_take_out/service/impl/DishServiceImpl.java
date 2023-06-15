@@ -52,4 +52,6 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         //因此才有了我们上面获取菜品id设置进入flavors表中的操作
         dishFlavorService.saveBatch(dishDto.getFlavors()); //这个方法是批量保存
     }
+
+
 }
