@@ -89,4 +89,29 @@ public class DishController {
         //注意这里不要返回pageInfo
         return R.success(dishDtoPage);
     }
+
+    /**
+     * 根据id查询菜品信息和对应的口味信息
+     * @param id
+     * @return
+     */
+    // 	http://localhost:8080/dish/1669297871807627265
+    @GetMapping("/{id}")
+    // 注意这里是DishDto不是Dish,因为页面的回显包含了菜品口味信息
+    public R<DishDto> getById(@PathVariable Long id){
+        DishDto dishDto = dishService.getByIdWithFlavor(id);
+        return R.success(dishDto);
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDto
+     * @return
+     */
+    // http://localhost:8080/dish
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto){
+        dishService.updateWithFlavor(dishDto);
+        return R.success("修改菜品成功");
+    }
 }
