@@ -94,4 +94,32 @@ public class SetmealController {
 
         return R.success(pageDtoInfo);
     }
+
+    /**
+     * 删除套餐
+     * @param ids
+     * @return
+     */
+    // http://localhost:8080/setmeal?ids=1669518172181078017
+    // http://localhost:8080/setmeal?ids=1669518172181078017,1415580119015145474
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info("ids:{}",ids);
+        setmealService.removeWithDish(ids);
+        return R.success("套餐数据删除成功");
+    }
+
+    /**
+     * 停售/起售套餐
+     * @param status
+     * @param ids
+     * @return
+     */
+    //http://localhost:8080/setmeal/status/1?ids=xxx,xxx
+    @PostMapping("/status/{status}")
+    public R<String> changeStatus(@PathVariable Integer status, @RequestParam List<Long> ids){
+        log.info("status:{},ids:{}",status,ids);
+        setmealService.updateSetmealStatusById(status,ids);
+        return R.success("修改成功");
+    }
 }
